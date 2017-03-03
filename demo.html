@@ -1,0 +1,109 @@
+<html>
+<head>
+<script src="jquery-1.9.1.min.js"></script>
+<script>
+	$(function(){
+	
+		// check child
+		var _checkedChild = function(_self){
+			var _tag = "";
+			var self = $("input[self="+_self+"]");
+			self.each(function(i, data){
+				_tag += this.checked;
+			});
+			
+			if(_tag.indexOf("false")<0){
+				var _f = true;
+				var _child = $("input[child="+_self+"]");
+				_child.each(function(i, e){
+					console.log(this.checked = true);
+					if(_f){
+						_checkedChild($(this).attr("self"));
+						_f = false;
+					}
+				});
+				
+			}
+		}
+		
+		// uncheck child
+		var _uncheckedChild = function(child){
+			var _f = true;
+			var self = $("input[child="+child+"]");
+			self.each(function(i, data){
+				$(data).removeAttr("checked");
+				if(_f){
+					_uncheckedChild($(this).attr("self"));
+					_f = false;
+				}
+			});
+		};
+		
+		// uncheck self
+		var _uncheckedSelf = function(self){
+			var self = $("input[self="+self+"]");
+			self.each(function(i, data){
+				$(data).removeAttr("checked");
+				if($(this).attr("child")!= undefined){
+					_uncheckedSelf($(this).attr("child"));
+				}
+			});
+		};
+		
+		// check self
+		var _checkedSelf = function(self){
+			var self = $("input[self="+self+"]");
+			self.each(function(i, data){
+				this.checked = true;
+				if($(this).attr("child")!= undefined){
+					_checkedSelf($(this).attr("child"));
+				}
+			});
+		};
+
+		
+		$("input[self]").change(function(){
+			if(this.checked){
+				_checkedChild($(this).attr("self"));
+			}else{
+				_uncheckedChild($(this).attr("self"));
+			}
+		});
+		
+		$("input[child]").change(function(){
+			if(!this.checked){
+				_uncheckedSelf($(this).attr("child"));
+			}else{
+				_checkedSelf($(this).attr("child"));
+			}
+		});
+	});
+	
+</script>
+</head>
+<body>
+<label for="nn">nn</label>
+<input id="nn" type="checkbox" name="self1" child="self1">
+<input type="checkbox" name="name1" self="self1">
+<input type="checkbox" name="name2" self="self1" child="self3">
+<input type="checkbox" name="name3" self="self1">
+<input type="checkbox" name="name4" self="self1">
+<input type="checkbox" name="name5" self="self1">
+<br>
+<input type="checkbox" name="name3" self="self3">
+<input type="checkbox" name="name4" self="self3">
+<input type="checkbox" name="name5" self="self3" child="self4">
+<br>
+<input type="checkbox" name="name3" self="self4">
+<input type="checkbox" name="name4" self="self4">
+
+<br>
+
+<input type="checkbox" name="self2" child="self2">
+<input type="checkbox" name="name1" self="self2">
+<input type="checkbox" name="name2" self="self2">
+<input type="checkbox" name="name3" self="self2">
+<input type="checkbox" name="name4" self="self2">
+<input type="checkbox" name="name5" self="self2">
+</body>
+</html>
